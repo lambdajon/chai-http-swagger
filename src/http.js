@@ -62,7 +62,9 @@ module.exports = function (chai, _) {
       request: {
         security,
         body: {},
-        header: {},
+        header: {
+          // 
+        },
       }
     }
 
@@ -95,6 +97,7 @@ module.exports = function (chai, _) {
               securityKeys.forEach((key) => {
                 temp = temp.set(key, security[key])
               })
+              temp = temp.set('user-agent', 'node-superagent/3.8.3')
               temp = temp.send(conf.body.json)
             }
             else if (conf.body.formData) {
@@ -102,6 +105,7 @@ module.exports = function (chai, _) {
               securityKeys.forEach((key) => {
                 temp = temp.set(key, security[key])
               })
+              temp = temp.set('user-agent', 'node-superagent/3.8.3')
               let bodyData = {}
               let attachments = {}
               let formData = conf.body.formData
@@ -146,6 +150,7 @@ module.exports = function (chai, _) {
             securityKeys.forEach((key) => {
               temp = temp.set(key, security[key])
             })
+            temp = temp.set('user-agent', 'node-superagent/3.8.3')
             temp = temp.send(conf.body.json)
           }
         }
@@ -154,6 +159,14 @@ module.exports = function (chai, _) {
           securityKeys.forEach((key) => {
             temp = temp.set(key, security[key])
           })
+          temp = temp.set('user-agent', 'node-superagent/3.8.3')
+        }
+        if(requestData[relativePath][conf.method] && requestData[relativePath][conf.method].request){
+          
+          requestData[relativePath][conf.method].request.header = {
+            ...requestData[relativePath][conf.method].request.header,
+          }
+          requestData[relativePath][conf.method].request.header['user-agent'] = 'node-superagent/3.8.3'
         }
       }
       else {
