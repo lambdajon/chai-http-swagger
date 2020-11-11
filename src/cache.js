@@ -248,6 +248,12 @@ class Routes {
     router.use('/', swaggerUi.serve, swaggerUi.setup(swaggerDocs))
     return router;
   }
+  getCallerName(){
+    if(this.config.callerName){
+      return this.config.callerName
+    }
+    return null
+  }
 }
 
 const routeCollection = new Routes()

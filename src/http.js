@@ -38,7 +38,7 @@ module.exports = function (chai, _) {
 
   const rq = require('./request');
   // chai.request = require('./request');
-  chai.request = (conf) => {
+  const request = (conf) => {
 
     let pathParams
 
@@ -65,7 +65,7 @@ module.exports = function (chai, _) {
         header: {},
       }
     }
-    
+
     if (conf.security && Object.keys(conf.security).length > 0) {
       security = conf.security;
       securityKeys = Object.keys(security);
@@ -79,7 +79,7 @@ module.exports = function (chai, _) {
     Object.keys(requestObj).forEach(methodName => {
 
       if (methodName == conf.method) {
-        
+
         if (methodName === 'post' || methodName === 'put') {
           if (conf.body) {
 
@@ -164,6 +164,16 @@ module.exports = function (chai, _) {
     return temp;
   }
 
+  if (cache.getCallerName()) {
+    if (!chai[cache.getCallerName()]) {
+      chai[cache.getCallerName()] = request
+    }
+    else {
+      chai.request = request
+    }
+  } else {
+    chai.request = request
+  }
   /*!
    * Content types hash. Used to
    * define `Assertion` properties.
