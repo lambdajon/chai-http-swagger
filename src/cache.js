@@ -80,9 +80,6 @@ class Routes {
         const lowerMethod = method.toLowerCase()
         this.docs[path][lowerMethod] = {}
 
-
-        // security tokens
-
         if (this.swaggerConfig
           && this.swaggerConfig.swaggerDefinition
           && this.swaggerConfig.swaggerDefinition.components
@@ -90,9 +87,7 @@ class Routes {
             
           const SecurityInSwagger = this.swaggerConfig.swaggerDefinition.components.securitySchemes;
           const SecurityKeysInSwagger = Object.keys(SecurityInSwagger);
-          // console.log(this.swaggerConfig.swaggerDefinition.components.securitySchemes)
           
-          // this.docs[path][lowerMethod].security = []
           const SecurityList = []
 
           SecurityKeysInSwagger.forEach((key) => {
@@ -112,7 +107,6 @@ class Routes {
           if(SecurityList.length > 0){
             this.docs[path][lowerMethod].security = SecurityList
           }
-          // console.log(this.routes[path][lowerMethod])
         } 
 
         this.docs[path][lowerMethod].tags = [`${(path.split('/').filter(name => name))[0]}`.toUpperCase()]
