@@ -131,7 +131,7 @@ After configure swagger add security property in your request
     })
 ```
 
-If you want more example see [this][https://github.com/AhmadulinJs/chai-http-swagger-examples/blob/main/src/test/testSecureApis.test.js]
+If you want more example see [this](https://github.com/AhmadulinJs/chai-http-swagger-examples/blob/main/src/test/testSecureApis.test.js)
 
 ---
 
