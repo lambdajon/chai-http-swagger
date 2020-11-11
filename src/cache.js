@@ -150,7 +150,7 @@ class Routes {
 
         this.docs[path][lowerMethod].parameters = paramsList
 
-        if (this.routes[path][method].request && this.routes[path][method].request.body) {
+        if (this.routes[path][method].request && this.routes[path][method].request.body && Object.keys(this.routes[path][method].request.body).length > 0) {
           if (this.routes[path][method].request.header && Object.keys(this.routes[path][method].request.header)[0]) {
             this.docs[path][lowerMethod].requestBody = {}
             const requestHeader = this.routes[path][method].request.header
