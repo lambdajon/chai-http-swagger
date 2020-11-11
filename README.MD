@@ -20,8 +20,13 @@ npm install chai-http-swagger
   - [Installation](#installation)
 - [Summary](#summary)
   - [Usage](#usage)
-  - [Secured-APIs](#secured-apis)
+  - [Send Request Body](#send-request-body)
+    - [application/json](#json)
+    - [multipart/form-data](#formdata)
+      - [Upload File](#upload-file)
+  - [Secured APIs](#secured-apis)
 - [Demo](#demo)
+
 ---
 
 ## Usage
@@ -37,8 +42,8 @@ const options = {
   },
   config: {
     swaggerPath: __dirname, // your .yamlfiles directory
-    fileName: 'test' // your custom fileName for generated .yaml files
-  }
+    fileName: "test", // your custom fileName for generated .yaml files
+  },
 };
 const chaiHttpSwaggerSetup = setup(options);
 
@@ -80,7 +85,102 @@ it("should check status", (done) => {
     });
 });
 ```
+
 Run your tests and generate `.yaml` files for swagger
+
+---
+
+## Send Request Body
+
+## JSON
+
+Send json data to api
+
+```javascript
+it("should create new data", (done) => {
+  const data = {
+    msg: "Hello World",
+  };
+  chai
+    .request({
+      app,
+      method: "post",
+      path: "/data",
+      body: {
+        json: data, // this is automaticly set Content-Type: application/json
+      },
+    })
+    // .send(data)
+    .end((err, res) => {
+      res.should.have.status(200);
+      res.should.be.a("Object");
+      targetUser = res.body;
+      done();
+    });
+});
+```
+
+## FormData
+
+Send form-data to api
+
+```javascript
+it("should create new data", (done) => {
+  const data = {
+    msg: "Hello World",
+  };
+  chai
+    .request({
+      app,
+      method: "post",
+      path: "/data",
+      body: {
+        formData: data, // this is automaticly set Content-Type: multipart/form-data
+      },
+    })
+    // .send(data)
+    .end((err, res) => {
+      res.should.have.status(200);
+      res.should.be.a("Object");
+      targetUser = res.body;
+      done();
+    });
+});
+```
+
+## Upload file
+
+```javascript
+it("should create new data", (done) => {
+  const data = {
+    msg: "Hello World",
+  };
+  chai
+    .request({
+      app,
+      method: "post",
+      path: "/data",
+      body: {
+        formData: {
+          ...data,
+          attachments: {
+            // files
+            imgFile: [`/img.png`, "img.png"],
+          },
+        }, // this is automaticly set Content-Type: multipart/form-data
+      },
+    })
+    // .send(data)
+    .end((err, res) => {
+      res.should.have.status(200);
+      res.should.be.a("Object");
+      targetUser = res.body;
+      done();
+    });
+});
+```
+You can send file to server in the `attachments`
+
 ---
 
 ## Secured apis
@@ -91,44 +191,44 @@ Add Security schema to your `swagger` config
 const options = {
   swagger: {
     swaggerDefinition: {
-      openapi: '3.0.0',
+      openapi: "3.0.0",
       components: {
         securitySchemes: {
           Bearer: {
-            type: 'apiKey',
-            name: 'Authorization', // api security key name
-            in: 'header',
-            description: 'Please use login api to get accessToken'
-          }
-        }
-      }
-    }
-
+            type: "apiKey",
+            name: "Authorization", // api security key name
+            in: "header",
+            description: "Please use login api to get accessToken",
+          },
+        },
+      },
+    },
   },
-  config: {}
+  config: {},
 };
 ```
 
 After configure swagger add security property in your request
 
 ```javascript
-  it('should get private message', (done) => {
-      chai.request({
-        app,
-        method: 'get',
-        path: '/private',
-        security: {
-          Authorization: 'token' // your token data 
-        },
-      })
-        .end((err, res) => {
-          res.should.have.status(200);
-          res.should.be.a('Object');
-          res.body.should.be.a('Object');
-          res.body.msg.should.be.equal('PRIVATE_MESSAGE')
-          done()
-        })
+it("should get private message", (done) => {
+  chai
+    .request({
+      app,
+      method: "get",
+      path: "/private",
+      security: {
+        Authorization: "token", // your token data
+      },
     })
+    .end((err, res) => {
+      res.should.have.status(200);
+      res.should.be.a("Object");
+      res.body.should.be.a("Object");
+      res.body.msg.should.be.equal("PRIVATE_MESSAGE");
+      done();
+    });
+});
 ```
 
 If you want more example see [this](https://github.com/AhmadulinJs/chai-http-swagger-examples/blob/main/src/test/testSecureApis.test.js)
