@@ -20,6 +20,7 @@ npm install chai-http-swagger
   - [Installation](#installation)
 - [Summary](#summary)
   - [Usage](#usage)
+  - [Secured-APIs](#secured-apis)
 - [Demo](#demo)
 ---
 
@@ -80,6 +81,57 @@ it("should check status", (done) => {
 });
 ```
 Run your tests and generate `.yaml` files for swagger
+---
+
+## Secured apis
+
+Add Security schema to your `swagger` config
+
+```javascript
+const options = {
+  swagger: {
+    swaggerDefinition: {
+      openapi: '3.0.0',
+      components: {
+        securitySchemes: {
+          Bearer: {
+            type: 'apiKey',
+            name: 'Authorization', // api security key name
+            in: 'header',
+            description: 'Please use login api to get accessToken'
+          }
+        }
+      }
+    }
+
+  },
+  config: {}
+};
+```
+
+After configure swagger add security property in your request
+
+```javascript
+  it('should get private message', (done) => {
+      chai.request({
+        app,
+        method: 'get',
+        path: '/private',
+        security: {
+          Authorization: 'token' // your token data 
+        },
+      })
+        .end((err, res) => {
+          res.should.have.status(200);
+          res.should.be.a('Object');
+          res.body.should.be.a('Object');
+          res.body.msg.should.be.equal('PRIVATE_MESSAGE')
+          done()
+        })
+    })
+```
+
+If you want more example see [this][https://github.com/AhmadulinJs/chai-http-swagger-examples/blob/main/src/test/testSecureApis.test.js]
 
 ---
 
