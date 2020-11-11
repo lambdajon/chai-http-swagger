@@ -91,6 +91,11 @@ Run your tests and generate `.yaml` files for swagger
 ---
 
 ## Send Request Body
+---
+
+You can send body application/json or multipart/form-data content types
+
+---
 
 ## JSON
 
