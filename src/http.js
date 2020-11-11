@@ -164,7 +164,6 @@ module.exports = function (chai, _) {
     return temp;
   }
 
-  // chai.generateDocs = cache.generateDocs;
   /*!
    * Content types hash. Used to
    * define `Assertion` properties.
