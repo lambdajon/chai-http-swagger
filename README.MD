@@ -1,8 +1,8 @@
 # Chai-HTTP-Swagger
 
-> Chai plugin for generate Swagger documentation of Chai HTTP testcases
+> A Chai plugin for generating Swagger documentation from Chai HTTP testcases
 
-The library provides [Chai](http://chaijs.com/) assertions for responses from http requests made using [Chai-HTTP](https://www.chaijs.com/plugins/chai-http/). And documented your api. This library automaticly generate [Swagger/OpenAPI](https://swagger.io/docs/specification/about/) documentation and schemas
+The library provides [Chai](http://chaijs.com/) assertions for responses from http requests made using [Chai-HTTP](https://www.chaijs.com/plugins/chai-http/) and documents your api. This library automatically generates [Swagger/OpenAPI](https://swagger.io/docs/specification/about/) documentation and schemas.
 
 ---
 
@@ -73,7 +73,7 @@ chai.use(chaiHttpSwagger.httpClient);
 it("should check status", (done) => {
   chai
     .request({
-      app, // your express aplication
+      app, // your express application
       method: "get", // request method
       path: "/status",
     })
@@ -86,7 +86,7 @@ it("should check status", (done) => {
 });
 ```
 
-Run your tests and generate `.yaml` files for swagger
+Run your tests and generate `.yaml` files for Swagger
 
 ---
 
@@ -112,7 +112,7 @@ it("should create new data", (done) => {
       method: "post",
       path: "/data",
       body: {
-        json: data, // this is automaticly set Content-Type: application/json
+        json: data, // this is automatically set Content-Type: application/json
       },
     })
     // .send(data)
@@ -140,7 +140,7 @@ it("should create new data", (done) => {
       method: "post",
       path: "/data",
       body: {
-        formData: data, // this is automaticly set Content-Type: multipart/form-data
+        formData: data, // this is automatically set Content-Type: multipart/form-data
       },
     })
     // .send(data)
@@ -172,7 +172,7 @@ it("should create new data", (done) => {
             // files
             imgFile: [`/img.png`, "img.png"],
           },
-        }, // this is automaticly set Content-Type: multipart/form-data
+        }, // this is automatically set Content-Type: multipart/form-data
       },
     })
     // .send(data)
@@ -213,7 +213,7 @@ const options = {
 };
 ```
 
-After configure swagger add security property in your request
+After configuring Swagger, add security property in your request
 
 ```javascript
 it("should get private message", (done) => {
@@ -236,7 +236,7 @@ it("should get private message", (done) => {
 });
 ```
 
-If you want more example see [this](https://github.com/AhmadulinJs/chai-http-swagger-examples/blob/main/src/test/testSecureApis.test.js)
+If you want more examples, see [this](https://github.com/AhmadulinJs/chai-http-swagger-examples/blob/main/src/test/testSecureApis.test.js)
 
 ---
 
@@ -246,4 +246,4 @@ If you want more example see [this](https://github.com/AhmadulinJs/chai-http-swa
 
 ---
 
-Happy Coding !
+Happy Coding!
