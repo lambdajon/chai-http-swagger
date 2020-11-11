@@ -15,8 +15,12 @@
     "documentation-generator",
     "generator"
   ],
-  "author": "Kadirov Akhmad",
+  "author": "Kadirov Akhmad <ahmadulinjs@gmail.com>",
   "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/AhmadulinJs/chai-http-swagger/issues"
+  },
+  "homepage": "https://github.com/AhmadulinJs/chai-http-swagger",
   "dependencies": {
     "chai": "^4.2.0",
     "charset": "^1.0.1",
