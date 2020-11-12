@@ -203,8 +203,8 @@ const routesCache = require('./cache');
  * ```
  *
  */
-const querystring = require('querystring');
 const url = require('url');
+const querString = require('querystring')
 module.exports = function (app, config) {
   // console.log('CONFIG')
   // console.log(config)
@@ -366,16 +366,20 @@ function Test(app, method, path, config) {
   this.app = app;
   this.url = typeof app === 'string' ? app + path : serverAddress(app, path);
   this.ok(function (e) {
+    let parsedUrl;
     let path;
-    if(config && config.relativePath){
+    if (config && config.relativePath) {
       path = config.relativePath
+      parsedUrl = url.parse(config.relativePath)
     }
     else {
-      const hasUrl = url.parse(e.req.path)
+      parsedUrl = url.parse(e.req.path)
       path = hasUrl.pathname;
     }
+    path = parsedUrl.pathname;
+
     const responseData = {};
-    
+
     responseData[path] = {}
     responseData[path][method] = {}
     responseData[path][method]['responses'] = {}
@@ -383,6 +387,8 @@ function Test(app, method, path, config) {
       body: e.body,
       header: e.headers
     }
+
+  
     routesCache.setResponse(responseData);
 
     return true;

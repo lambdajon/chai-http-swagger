@@ -25,6 +25,7 @@ module.exports = function (chai, _) {
   var Cookie = require('cookiejar');
   var charset = require("charset");
   var fs = require('fs')
+  const querString = require('querystring')
   /*!
    * Aliases.
    */
@@ -35,11 +36,10 @@ module.exports = function (chai, _) {
   /*!
    * Expose request builder
    */
-
   const rq = require('./request');
   // chai.request = require('./request');
   const request = (conf) => {
-
+    conf.method = conf.method.toLowerCase()
     let pathParams
 
     if (conf.params && conf.params.path) {
@@ -47,13 +47,16 @@ module.exports = function (chai, _) {
     }
     const paramsMatch = /\:([\w_-\d]+)/g
     const pathMatch = [...conf.path.matchAll(paramsMatch)]
-    let relativePath = conf.path;
-    let absolutePath = conf.path
+    let parsedUrl = url.parse(conf.path);
+    let relativePath = parsedUrl.pathname;
+    let absolutePath = parsedUrl.pathname;
+
+    const qrs = { ...querString.parse(parsedUrl.query) }
+    
     pathMatch.forEach((pathParam) => {
       relativePath = relativePath.replace(pathParam[0], `{${pathParam[1]}}`)
       absolutePath = absolutePath.replace(pathParam[0], pathParams[pathParam[1]])
     })
-    // console.log(absolutePath)
     let security = {}
     let securityKeys = []
     const requestData = {}
@@ -76,7 +79,6 @@ module.exports = function (chai, _) {
 
     const requestObj = rq(conf.app, { relativePath })
     let temp;
-
 
     Object.keys(requestObj).forEach(methodName => {
 
@@ -171,7 +173,9 @@ module.exports = function (chai, _) {
       }
       else {
       }
-    })
+      
+    });
+    requestData[relativePath][conf.method].request.queryParams = qrs
     cache.setRequest(requestData)
 
     return temp;
