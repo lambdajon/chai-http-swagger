@@ -155,7 +155,11 @@ class Routes {
             this.docs[path][lowerMethod].requestBody = {}
             const requestHeader = this.routes[path][method].request.header
             let contentTypeRequest = requestHeader[Object.keys(this.routes[path][method].request.header)[0]]
-            let modelelCol = path.split('/').filter(name => name)
+            let modelelCol = path.split('/').filter(name => name).map(name => name.replace(/[^a-zA-Z ]/g, ""))
+
+            console.log('MODEL')
+            console.log(this.routes[path][method])
+            console.log('MODEL')
             let hasTag =
               modelelCol.push(lowerMethod)
             let modelName = modelelCol.join('_')
@@ -178,8 +182,9 @@ class Routes {
               ...basicSchema.properties,
               ...fileObjects
             }
-
+            
             this.models.components.schemas[modelName] = basicSchema
+
             this.docs[path][lowerMethod].requestBody['content'] = {}
             this.docs[path][lowerMethod].requestBody['content'][contentTypeRequest] = {
               schema: {
