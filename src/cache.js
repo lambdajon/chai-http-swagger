@@ -94,10 +94,8 @@ class Routes {
             const securityObj = {}
             securityObj[key] = []
             if(this.routes[path][lowerMethod].request && this.routes[path][lowerMethod].request.security && securityObj[key]){
-              console.log()
               const securityKeyName = SecurityInSwagger[key]['name']
 
-              console.log()
               if(this.routes[path][lowerMethod].request.security[securityKeyName]){
                 SecurityList.push(securityObj)
               }
@@ -157,9 +155,6 @@ class Routes {
             let contentTypeRequest = requestHeader[Object.keys(this.routes[path][method].request.header)[0]]
             let modelelCol = path.split('/').filter(name => name).map(name => name.replace(/[^a-zA-Z ]/g, ""))
 
-            console.log('MODEL')
-            console.log(this.routes[path][method])
-            console.log('MODEL')
             let hasTag =
               modelelCol.push(lowerMethod)
             let modelName = modelelCol.join('_')

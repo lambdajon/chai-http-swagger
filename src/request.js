@@ -206,9 +206,7 @@ const routesCache = require('./cache');
 const url = require('url');
 const querString = require('querystring')
 module.exports = function (app, config) {
-  // console.log('CONFIG')
-  // console.log(config)
-  // console.log('CONFIG')
+
   // this.config = config;
   /*!
    * @param {Mixed} function or server
