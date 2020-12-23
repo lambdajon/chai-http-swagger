@@ -388,6 +388,7 @@ function Test(app, method, path, config) {
 
   
     routesCache.setResponse(responseData);
+    routesCache.setRequestResponse(responseData);
 
     return true;
   });

@@ -62,6 +62,7 @@ module.exports = function (chai, _) {
     const requestData = {}
     requestData[relativePath] = {}
     requestData[relativePath][conf.method] = {
+      description: conf.description,
       request: {
         security,
         body: {},
@@ -177,7 +178,7 @@ module.exports = function (chai, _) {
     });
     requestData[relativePath][conf.method].request.queryParams = qrs
     cache.setRequest(requestData)
-
+    cache.setRequestResponse(requestData)
     return temp;
   }
 

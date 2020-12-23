@@ -16,6 +16,8 @@ class Routes {
         schemas: {}
       }
     }
+    this.requestResponses = []
+    this.failedTests = [];
     this.swaggerConfig = {}
     this.config = {}
   }
@@ -197,9 +199,7 @@ class Routes {
             content: {}
           }
 
-          const body = toJsonSchema(this.routes[path][method].responses[code].body, {
-            arrays: { mode: "uniform" }
-          })
+          const body = toJsonSchema(this.routes[path][method].responses[code].body, )
 
           codes[code].content[contentType] = {
             schema: body
@@ -254,11 +254,38 @@ class Routes {
     }
     return null
   }
+  
+  setRequestResponse(data) {
+    this.requestResponses.push(data);
+  }
+
+  skip(description) {
+
+    this.failedTests.push(description);
+    // console.log(this.failedTests)
+  }
+  skipFailedRequests() {
+
+    Object.keys(this.routes).forEach(pathName => {
+      Object.keys(this.routes[pathName]).forEach(methodName =>{
+        const existing = this.failedTests.find(title => title === this.routes[pathName][methodName].description)
+        if(existing){
+          if(Object.keys(this.routes[pathName]).length > 1){
+            delete this.routes[pathName][methodName]
+          }
+          else{
+            delete this.routes[pathName]
+          }
+        }
+      })
+    })
+  }
 }
 
 const routeCollection = new Routes()
 process.on('exit', (code) => {
   console.log('Generate Docs started... 🚀')
+  routeCollection.skipFailedRequests()
   routeCollection.generateDocs()
   console.log('Generate Docs successfully ✅',);
 });
