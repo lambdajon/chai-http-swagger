@@ -260,23 +260,26 @@ class Routes {
   }
 
   skip(description) {
-
     this.failedTests.push(description);
-    // console.log(this.failedTests)
   }
   skipFailedRequests() {
-
-    Object.keys(this.routes).forEach(pathName => {
-      Object.keys(this.routes[pathName]).forEach(methodName =>{
-        const existing = this.failedTests.find(title => title === this.routes[pathName][methodName].description)
-        if(existing){
-          if(Object.keys(this.routes[pathName]).length > 1){
-            delete this.routes[pathName][methodName]
+    this.requestResponses.forEach((rqrs, index) => {
+      Object.keys(rqrs).forEach(path => {
+        Object.keys(rqrs[path]).forEach(methodName => {
+          if (rqrs[path][methodName] && rqrs[path][methodName].description) {
+            const isFailed = this.failedTests.includes(rqrs[path][methodName].description)
+            delete rqrs[path][methodName].description
+            if(!isFailed){
+              
+              if(rqrs[path][methodName].request){
+                this.setRequest(this.requestResponses[index])
+              }
+              if(rqrs[path][methodName].responses){
+                this.setRequest(this.requestResponses[index])
+              }
+            }
           }
-          else{
-            delete this.routes[pathName]
-          }
-        }
+        })
       })
     })
   }

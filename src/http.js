@@ -177,7 +177,6 @@ module.exports = function (chai, _) {
       
     });
     requestData[relativePath][conf.method].request.queryParams = qrs
-    cache.setRequest(requestData)
     cache.setRequestResponse(requestData)
     return temp;
   }
