@@ -5,7 +5,6 @@ const httpStatusCodes = require('./httpStatusCodes');
 const router = require('express').Router();
 const swaggerJsDoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express');
-
 class Routes {
   constructor() {
     this.routes = {}
@@ -18,6 +17,8 @@ class Routes {
     }
     this.requestResponses = []
     this.failedTests = [];
+    this.failedRequests = []
+    this.failedResponses = []
     this.swaggerConfig = {}
     this.config = {}
   }
@@ -30,7 +31,6 @@ class Routes {
 
     const path = Object.keys(req)[0];
     const method = Object.keys(req[Object.keys(req)])[0];
-
     if (!this.routes[path]) {
       this.routes = { ...req, ...this.routes }
     }
@@ -72,6 +72,9 @@ class Routes {
     }
   }
 
+  setRequestResponse(data) {
+    this.requestResponses.push(data);
+  }
   generateDocs = () => {
 
     for (let path in this.routes) {
@@ -86,30 +89,61 @@ class Routes {
           && this.swaggerConfig.swaggerDefinition
           && this.swaggerConfig.swaggerDefinition.components
           && this.swaggerConfig.swaggerDefinition.components.securitySchemes) {
-            
+
           const SecurityInSwagger = this.swaggerConfig.swaggerDefinition.components.securitySchemes;
           const SecurityKeysInSwagger = Object.keys(SecurityInSwagger);
-          
+
           const SecurityList = []
 
           SecurityKeysInSwagger.forEach((key) => {
             const securityObj = {}
             securityObj[key] = []
-            if(this.routes[path][lowerMethod].request && this.routes[path][lowerMethod].request.security && securityObj[key]){
+            if (this.routes[path][lowerMethod].request && this.routes[path][lowerMethod].request.security && securityObj[key]) {
               const securityKeyName = SecurityInSwagger[key]['name']
 
-              if(this.routes[path][lowerMethod].request.security[securityKeyName]){
+              if (this.routes[path][lowerMethod].request.security[securityKeyName]) {
                 SecurityList.push(securityObj)
               }
             }
           })
 
-          if(SecurityList.length > 0){
+          if (SecurityList.length > 0) {
             this.docs[path][lowerMethod].security = SecurityList
           }
-        } 
+        }
 
-        this.docs[path][lowerMethod].tags = [`${(path.split('/').filter(name => name))[0]}`.toUpperCase()]
+        if (this.config && this.config.specificFunctionals && this.config.specificFunctionals.generateTagsByPrefix) {
+          let tags = '';
+          let paths = (path.split('/').filter(name => name))
+          if (paths && path.length > 2) {
+
+            let moduleName = ''
+            if (paths[2] && paths.find((p) => p === 'p' || p === 'a' || p === 'i')) {
+              moduleName = paths[2].charAt(0).toUpperCase() + paths[2].slice(1);
+            } else {
+              moduleName = paths[1].charAt(0).toUpperCase() + paths[1].slice(1);
+            }
+            switch (paths[1]) {
+              case 'p':
+                tags += `Public${moduleName}`;
+                break;
+              case 'i':
+                tags += `Private${moduleName}`;
+                break;
+              case 'a':
+                tags += `Admin${moduleName}`;
+                break;
+              default:
+                tags += `Private${moduleName}`;
+                break;
+            }
+            this.docs[path][lowerMethod].tags = [tags];
+          }
+        }
+        else {
+          this.docs[path][lowerMethod].tags = [`${(path.split('/').filter(name => name))[0]}`.toUpperCase()]
+        }
+
         let paramsList = []
         let regExpPath = /{(.*?)}/gi
         let pathParams = path.match(regExpPath)
@@ -179,7 +213,7 @@ class Routes {
               ...basicSchema.properties,
               ...fileObjects
             }
-            
+
             this.models.components.schemas[modelName] = basicSchema
 
             this.docs[path][lowerMethod].requestBody['content'] = {}
@@ -199,7 +233,20 @@ class Routes {
             content: {}
           }
 
-          const body = toJsonSchema(this.routes[path][method].responses[code].body, )
+          const body = toJsonSchema(this.routes[path][method].responses[code].body, {
+            postProcessFnc: (type, schema, value, defaultFunc) => {
+              if (type === 'array') {
+                if (value.length <= 0) {
+                  return { ...schema, items: {} }
+                } else {
+                  return defaultFunc(type, schema, value)
+                }
+              }
+              else {
+                return defaultFunc(type, schema, value)
+              }
+            }
+          })
 
           codes[code].content[contentType] = {
             schema: body
@@ -214,12 +261,14 @@ class Routes {
         }
       }
     }
-    let docFilePath = `${this.config.swaggerPath}/${Date.now()}_doc.yaml`
-    let modelFilePath = `${this.config.swaggerPath}/${Date.now()}_model.yaml`
+    const fileExtension = this.config.format || 'json'
+    let docFilePath = `${this.config.swaggerPath}/${Date.now()}_doc.${fileExtension}`
+    let modelFilePath = `${this.config.swaggerPath}/${Date.now()}_model.${fileExtension}`
     if (this.config.fileName) {
-      docFilePath = `${this.config.swaggerPath}/${this.config.fileName}_doc.yaml`
-      modelFilePath = `${this.config.swaggerPath}/${this.config.fileName}_model.yaml`
+      docFilePath = `${this.config.swaggerPath}/${this.config.fileName}_doc.${fileExtension}`
+      modelFilePath = `${this.config.swaggerPath}/${this.config.fileName}_model.${fileExtension}`
     }
+
     const strDocs = JSON.stringify(this.docs)
     const jsonDocs = JSON.parse(strDocs);
     const yamlDocs = YAML.stringify(jsonDocs);
@@ -229,7 +278,6 @@ class Routes {
     const jsonModels = JSON.parse(strModels);
     const yamlModels = YAML.stringify(jsonModels);
     fs.writeFileSync(modelFilePath, yamlModels, 'utf-8');
-
   }
   setup(conf) {
     this.config = conf.config
@@ -243,22 +291,20 @@ class Routes {
   setupSwagger(config) {
     this.swaggerConfig = config
     this.swaggerConfig.apis = [`${this.config.swaggerPath}/*.yaml`]
-    
     const swaggerDocs = swaggerJsDoc(this.swaggerConfig);
+
+    swaggerDocs.apis = this.swaggerConfig.apis
+
     router.use('/', swaggerUi.serve, swaggerUi.setup(swaggerDocs))
     return router;
   }
-  getCallerName(){
-    if(this.config.callerName){
+  getCallerName() {
+
+    if (this.config.callerName) {
       return this.config.callerName
     }
     return null
   }
-  
-  setRequestResponse(data) {
-    this.requestResponses.push(data);
-  }
-
   skip(description) {
     this.failedTests.push(description);
   }

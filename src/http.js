@@ -14,6 +14,7 @@
 const cache = require('./cache');
 
 module.exports = function (chai, _) {
+  chai.Assertion.includeStack = true
 
   /*!
    * Module dependencies.
@@ -24,7 +25,6 @@ module.exports = function (chai, _) {
   var url = require('url');
   var Cookie = require('cookiejar');
   var charset = require("charset");
-  var fs = require('fs')
   const querString = require('querystring')
   /*!
    * Aliases.
@@ -32,13 +32,14 @@ module.exports = function (chai, _) {
 
   var Assertion = chai.Assertion
     , i = _.inspect;
-
   /*!
    * Expose request builder
    */
   const rq = require('./request');
   // chai.request = require('./request');
   const request = (conf) => {
+    // conf.app.req.description = conf.description
+    conf.app.description = conf.description
     conf.method = conf.method.toLowerCase()
     let pathParams
 
@@ -52,7 +53,7 @@ module.exports = function (chai, _) {
     let absolutePath = parsedUrl.pathname;
 
     const qrs = { ...querString.parse(parsedUrl.query) }
-    
+
     pathMatch.forEach((pathParam) => {
       relativePath = relativePath.replace(pathParam[0], `{${pathParam[1]}}`)
       absolutePath = absolutePath.replace(pathParam[0], pathParams[pathParam[1]])
@@ -164,8 +165,8 @@ module.exports = function (chai, _) {
           })
           temp = temp.set('user-agent', 'node-superagent/3.8.3')
         }
-        if(requestData[relativePath][conf.method] && requestData[relativePath][conf.method].request){
-          
+        if (requestData[relativePath][conf.method] && requestData[relativePath][conf.method].request) {
+
           requestData[relativePath][conf.method].request.header = {
             ...requestData[relativePath][conf.method].request.header,
           }
@@ -174,10 +175,26 @@ module.exports = function (chai, _) {
       }
       else {
       }
-      
+
     });
     requestData[relativePath][conf.method].request.queryParams = qrs
+
+
+    // console.log('CHAI DATA')
+    // // console.log(Object.keys(chai))
+    // console.log(chai)
+    // console.log('CHAI DATA')
+    // setTimeout(() => {
+    //   console.log('CHAI DATA')
+    //   console.log(Object.keys(conf.app))
+    //   console.log('CHAI DATA')
+    // }, 1)
+
+    // cache.setRequest(requestData)
     cache.setRequestResponse(requestData)
+    temp.app.description = conf.description;
+    // console.log(temp)
+
     return temp;
   }
 
@@ -575,4 +592,7 @@ module.exports = function (chai, _) {
       );
     }
   });
+
+
+
 };
