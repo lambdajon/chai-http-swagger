@@ -206,7 +206,6 @@ const routesCache = require('./cache');
 const url = require('url');
 const querString = require('querystring')
 module.exports = function (app, config) {
-
   // this.config = config;
   /*!
    * @param {Mixed} function or server
@@ -379,14 +378,13 @@ function Test(app, method, path, config) {
     const responseData = {};
 
     responseData[path] = {}
-    responseData[path][method] = {}
+    responseData[path][method] = { description: app.description }
     responseData[path][method]['responses'] = {}
     responseData[path][method]['responses'][e.status] = {
       body: e.body,
       header: e.headers
     }
 
-  
     routesCache.setRequestResponse(responseData);
 
     return true;

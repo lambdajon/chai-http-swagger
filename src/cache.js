@@ -261,7 +261,7 @@ class Routes {
         }
       }
     }
-    const fileExtension = this.config.format || 'json'
+    const fileExtension = this.config.format || 'yaml'
     let docFilePath = `${this.config.swaggerPath}/${Date.now()}_doc.${fileExtension}`
     let modelFilePath = `${this.config.swaggerPath}/${Date.now()}_model.${fileExtension}`
     if (this.config.fileName) {
